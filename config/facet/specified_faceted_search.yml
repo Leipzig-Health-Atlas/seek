@@ -78,7 +78,7 @@ Publication:
       value_from: related_organisms:title
   human_disease:
       label: Human Disease
-      value_from: related_human_diseases:title
+      value_from: human_diseases:title
 
 #yellow pages
 Person:

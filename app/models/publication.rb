@@ -500,11 +500,6 @@ class Publication < ApplicationRecord
     joins: [:assays_organisms, :models_organisms]
   )
 
-  # returns a list of related human diseases, related through either the assay or the model
-  def related_human_diseases
-    (assays.collect(&:human_diseases).flatten | models.collect(&:human_disease).flatten).uniq
-  end
-
   def self.subscribers_are_notified_of?(action)
     action == 'create'
   end
