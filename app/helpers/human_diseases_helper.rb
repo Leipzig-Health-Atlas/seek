@@ -79,9 +79,10 @@ module HumanDiseasesHelper
           title:        c.title,
           parent:       c.parents.first ? c.parents.first.id.to_s : '',
           projects:     c.projects.count,
-          assays:       c.assays.count,
+          # assays:       c.assays.count, # currently not in use
           publications: c.publications.count,
           models:       c.models.count,
+          data_files:   c.data_files.count,
         }
       end
     end

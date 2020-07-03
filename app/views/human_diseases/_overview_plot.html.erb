@@ -22,9 +22,10 @@
   var data = [
     <%
       plots = [
-        { key: :projects,     annotation: { x: 0.145, y: 1.05 } },
-        { key: :publications, annotation: { x: 0.5, y: 1.05 } },
-        { key: :models,       annotation: { x: 0.86, y: 1.05 } },
+        { key: :projects,     annotation: { x: 0.105, y: 1.05 } },
+        { key: :publications, annotation: { x: 0.37, y: 1.05 } },
+        { key: :models,       annotation: { x: 0.63, y: 1.05 } },
+        { key: :data_files,   annotation: { x: 0.895, y: 1.05 } },
       ]
       index = -1
     %>
@@ -48,7 +49,7 @@
   var layout = {
     margin: { l: 0, r: 0, b: 0, t: 50 },
     sunburstcolorway: [ '#217290', '#EC7063', '#5499C7', '#01d28e', '#f4d03f', '#8e44ad'],
-    grid: { rows: 1, columns:3, pattern: 'independent' },
+    grid: { rows: 1, columns: 4, pattern: 'independent' },
     annotations: [
       <% plots.each do |plot| %>
         {
