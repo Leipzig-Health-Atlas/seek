@@ -3,6 +3,7 @@ module Seek
     # Hard-coded list of available filters for types. Overrides the automatically discovered filters (via `has_filter`).
     AVAILABLE_FILTERS = {
         Publication: [:query, :programme, :project, :published_year, :publication_type, :author, :organism, :human_disease, :tag],
+        DataFile: [:human_disease],
         Event: [:query, :created_at, :country],
         Person: [:query, :programme, :project, :institution, :location, :project_position, :expertise, :tool]
     }.freeze

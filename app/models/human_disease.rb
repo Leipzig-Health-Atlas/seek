@@ -17,6 +17,7 @@ class HumanDisease < ApplicationRecord
 
   has_and_belongs_to_many :projects
   has_and_belongs_to_many :publications
+  has_and_belongs_to_many :data_files
 
   has_many :human_disease_parents, foreign_key: 'human_disease_id', class_name: 'HumanDiseaseParent'
   has_many :parents, through: :human_disease_parents, source: :parent, dependent: :destroy
@@ -69,7 +70,7 @@ class HumanDisease < ApplicationRecord
   end
 
   def can_delete?(user = User.current_user)
-    !user.nil? && user.is_admin_or_project_administrator? && models.empty? && assays.empty? && projects.empty? && publications.empty?
+    !user.nil? && user.is_admin_or_project_administrator? && models.empty? && assays.empty? && projects.empty? && publications.empty? && data_files.empty?
   end
 
   def can_manage?(_user = User.current_user)
@@ -114,7 +115,8 @@ class HumanDisease < ApplicationRecord
     ids = projects.pluck(:id).map { |x| 'proj_' + x.to_s } +
       assays.pluck(:id).map { |x| 'ass_' + x.to_s } +
       models.pluck(:id).map { |x| 'mod_' + x.to_s } +
-      publications.pluck(:id).map { |x| 'pub_' + x.to_s }
+      publications.pluck(:id).map { |x| 'pub_' + x.to_s } +
+      data_files.pluck(:id).map { |x| 'data_' + x.to_s }
     child_nodes = []
 
     children.each do |child|

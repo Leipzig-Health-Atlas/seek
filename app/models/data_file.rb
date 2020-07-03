@@ -8,7 +8,7 @@ class DataFile < ApplicationRecord
   # searchable must come before acts_as_asset call
   if Seek::Config.solr_enabled
     searchable(auto_index: false) do
-      text :spreadsheet_annotation_search_fields, :fs_search_fields
+      text :spreadsheet_annotation_search_fields, :fs_search_fields, :human_disease_terms
     end
   end
 
@@ -41,6 +41,9 @@ class DataFile < ApplicationRecord
       label_mapping: Seek::Filterer::MAPPINGS[:technology_type_label],
       joins: [:assays]
   )
+
+  has_and_belongs_to_many :human_diseases
+  has_filter :human_disease
 
   explicit_versioning(version_column: 'version', sync_ignore_columns: ['doi']) do
     include Seek::Data::SpreadsheetExplorerRepresentation
@@ -229,5 +232,9 @@ class DataFile < ApplicationRecord
     else
       return assay, Set.new
     end
+  end
+
+  def human_disease_terms
+    human_diseases.collect(&:searchable_terms).flatten
   end
 end

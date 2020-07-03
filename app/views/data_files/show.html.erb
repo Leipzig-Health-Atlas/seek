@@ -20,6 +20,13 @@
             <% end %>
         <% end %>
 
+        <% if Seek::Config.human_diseases_enabled %>
+          <p>
+            <strong>Human Diseases:</strong>
+            <%= human_diseases_link_list @data_file.human_diseases -%>
+          </p>
+        <% end %>
+
         <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @data_file} %>
 
         <%= render :partial => "assets/asset_doi", :locals => {:displayed_resource=>@display_data_file} %>

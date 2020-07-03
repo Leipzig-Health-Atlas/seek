@@ -501,7 +501,7 @@ class DataFilesController < ApplicationController
 
   def data_file_params
     params.require(:data_file).permit(:title, :description, :simulation_data, { project_ids: [] },
-                                      :license, :other_creators,{ event_ids: [] },
+                                      :license, :other_creators,{ event_ids: [] }, { human_disease_ids: [] },
                                       { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                                       { creator_ids: [] }, { assay_assets_attributes: [:assay_id, :relationship_type_id] },
                                       { scales: [] }, { publication_ids: [] },

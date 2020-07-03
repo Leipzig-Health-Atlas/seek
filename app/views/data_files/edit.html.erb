@@ -24,6 +24,10 @@
 
       </div>
 
+      <% if Seek::Config.human_diseases_enabled %>
+        <%= f.fancy_multiselect :human_diseases, { possibilities: HumanDisease.order(:title).all, with_new_link: true, hidden: false } %>
+      <% end %>
+
       <%= render :partial => "scales/scales_selector", :locals => {:object => @data_file} if show_scales? %>
 
       <%= render :partial => 'assets/license_selector', :locals => { :resource => @data_file } %>

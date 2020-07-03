@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_06_26_144637) do
+ActiveRecord::Schema.define(version: 2020_07_03_120513) do
 
   create_table "activity_logs", id: :integer,  force: :cascade do |t|
     t.string "action"
@@ -416,6 +416,13 @@ ActiveRecord::Schema.define(version: 2020_06_26_144637) do
   create_table "data_files_events", id: false,  force: :cascade do |t|
     t.integer "data_file_id"
     t.integer "event_id"
+  end
+
+  create_table "data_files_human_diseases", id: false, force: :cascade do |t|
+    t.integer "human_disease_id"
+    t.integer "data_file_id"
+    t.index ["data_file_id"], name: "index_diseases_data_files_on_data_file_id"
+    t.index ["human_disease_id", "data_file_id"], name: "index_diseases_data_files_on_disease_id_and_data_file_id"
   end
 
   create_table "data_files_projects", id: false,  force: :cascade do |t|
