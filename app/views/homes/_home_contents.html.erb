@@ -34,6 +34,6 @@
   </div>
 </div>
 
-<% if Seek::Config.human_diseases_enabled  %>
+<% if Seek::Config.human_diseases_enabled && Seek::Config.human_diseases_plot_enabled %>
   <%= render :partial => 'human_diseases/overview_plot' %>
 <% end %>
