@@ -9,6 +9,7 @@ class FiltererTest < ActiveSupport::TestCase
     assert_includes data_file_filters, :tag
     assert_includes data_file_filters, :created_at
     assert_includes data_file_filters, :project
+    assert_includes data_file_filters, :human_disease
     assert_not_includes data_file_filters, :assay_class
 
     assert_includes assay_filters, :query
@@ -16,6 +17,7 @@ class FiltererTest < ActiveSupport::TestCase
     assert_includes assay_filters, :created_at
     assert_includes assay_filters, :project
     assert_includes assay_filters, :assay_class
+    assert_includes assay_filters, :human_disease
     assert_not_includes assay_filters, :published_year
 
     Banana = Class.new(ApplicationRecord)
