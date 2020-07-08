@@ -17,6 +17,15 @@
   </div>
 <% end %>
 
+<div class="form-group">
+  <label><%= t('study') %> type</label>
+  <span id="data_file_type_selection">
+    <%= collection_select :study, :study_type_id, StudyType.order(:title), :id, :title,
+                          { :include_blank => 'Not specified' },
+                          { :class => 'form-control' } -%>
+  </span>
+</div>
+
 <%= folding_panel("#{t('investigation')} details") do %>
     <label class="required"><%= t('investigation') %></label>
     <div id="investigation_collection">

@@ -8,6 +8,9 @@ class Study < ApplicationRecord
     text :person_responsible do
       person_responsible.try(:name)
     end
+    text :study_type do
+      study_type.try(:title)
+    end
   end if Seek::Config.solr_enabled
 
   belongs_to :investigation
@@ -23,6 +26,9 @@ class Study < ApplicationRecord
   has_one :external_asset, as: :seek_entity, dependent: :destroy
 
   belongs_to :person_responsible, :class_name => "Person"
+
+  belongs_to :study_type
+  has_filter :study_type
 
   validates :investigation, presence: { message: "Investigation is blank or invalid" }, projects: true
 

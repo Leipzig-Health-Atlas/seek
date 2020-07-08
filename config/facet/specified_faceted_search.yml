@@ -19,6 +19,11 @@ Assay:
       facet_class: Exhibit.HierarchicalFacet
       tree_from: Seek::Ontologies::TechnologyTypeReader
 
+Study:
+  study_type:
+    label: Study Type
+    value_from: study_type:title
+
 #assets
 DataFile:
   assay_type:

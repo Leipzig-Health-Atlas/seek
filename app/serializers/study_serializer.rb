@@ -13,4 +13,8 @@ class StudySerializer < SnapshottableSerializer
   has_many :sops
   has_many :publications
   has_many :documents
+
+  attribute :study_type do
+    object.study_type.try(:title)
+  end
 end

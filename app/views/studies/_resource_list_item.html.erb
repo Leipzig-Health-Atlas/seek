@@ -4,6 +4,10 @@
   <div class="col-sm-6">
     <%= list_item_authorized_attribute t('person_responsible').capitalize, resource.person_responsible %>
     <%= list_item_snapshot_list resource %>
+    <p id="study_type">
+      <b><%= t('study') %> type:</b>
+      <%= study_type_text resource.study_type %>
+    </p>
     <%= list_item_doi(resource) %>
   </div>
 

@@ -32,6 +32,11 @@
           </p>
         <% end %>
 
+        <p id="study_type">
+          <b><%= t('study') %> type:</b>
+          <%= study_type_text @study.study_type %>
+        </p>
+
       </div>
     </div>
     <% if @study.external_asset %>

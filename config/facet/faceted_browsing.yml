@@ -32,6 +32,9 @@ Study:
   contributor:
       label: Contributor
       value_from: contributor:person:name
+  study_type:
+      label: Study Type
+      value_from: study_type:title
 
 Assay:
   organism:

@@ -43,3 +43,10 @@ study_with_modelling_assay:
   investigation: metabolomics_investigation2
   description: Blah blah blah
   policy: editing_for_all_sysmo_users_policy
+
+study_with_study_type:
+  title: study with study type
+  investigation: metabolomics_investigation
+  description: I do have a study type!
+  policy: editing_for_all_sysmo_users_policy
+  study_type: case_control_study

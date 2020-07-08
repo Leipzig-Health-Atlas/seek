@@ -110,6 +110,11 @@ module Seek
             label_field: 'publication_types.title',
             joins: [:publication_type]
         ),
+        study_type: Seek::Filtering::Filter.new(
+          value_field: 'study_types.id',
+          label_field: 'study_types.title',
+          joins: [:study_type]
+        ),
     }.freeze
 
     def initialize(klass)

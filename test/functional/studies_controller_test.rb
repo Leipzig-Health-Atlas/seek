@@ -734,4 +734,17 @@ class StudiesControllerTest < ActionController::TestCase
 
 
   end
+
+  test 'should set study type to nil' do
+    put :update, params: { id: studies(:study_with_study_type).id, study: { study_type_id: nil } }
+    assert assigns(:study)
+    assert_nil assigns(:study).study_type
+  end
+
+  test 'should update study with study type' do
+    type = study_types(:genetic_study)
+    put :update, params: { id: studies(:study_with_study_type).id, study: { study_type_id: type.id } }
+    assert assigns(:study)
+    assert_equal type, assigns(:study).study_type
+  end
 end

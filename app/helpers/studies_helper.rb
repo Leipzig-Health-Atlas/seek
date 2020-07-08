@@ -29,4 +29,8 @@ module StudiesHelper
   def authorised_studies(projects = nil)
     authorised_assets(Study, projects, 'view')
   end
+
+  def study_type_text(study_type)
+    study_type ? study_type.title : '<span class="none_text">Not specified</span>'.html_safe
+  end
 end
