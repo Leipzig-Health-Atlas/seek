@@ -63,9 +63,7 @@
     <% end %>
 
     <% if Seek::Config.human_diseases_enabled %>
-        <div id="add_human_disease_form">
-          <%= render :partial=>"assays/select_human_diseases" -%>
-        </div>
+      <%= f.fancy_multiselect :human_diseases, { possibilities: HumanDisease.order(:title).all, with_new_link: true, hidden: false } %>
     <% end %>
 
     <% if show_scales? %>
