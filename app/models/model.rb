@@ -43,6 +43,11 @@ class Model < ApplicationRecord
       label_field: 'organisms.title',
       includes: [:organism]
   )
+  has_filter human_disease: Seek::Filtering::Filter.new(
+    value_field: 'human_diseases.id',
+    label_field: 'human_diseases.title',
+    includes: [:human_disease]
+  )
 
   has_filter  :model_type, :model_format, :recommended_environment
   has_filter modelling_analysis_type: Seek::Filtering::Filter.new(
