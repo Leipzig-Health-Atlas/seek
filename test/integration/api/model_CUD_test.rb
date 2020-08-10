@@ -9,6 +9,10 @@ class ModelCUDTest < ActionDispatch::IntegrationTest
     @clz = 'model'
     @plural_clz = @clz.pluralize
     @project = @current_user.person.projects.first
+    @organism = Factory(:organism)
+    @project.organisms << @organism
+    @human_disease = Factory(:human_disease)
+    @project.human_diseases << @human_disease
     investigation = Factory(:investigation, projects: [@project], contributor: @current_person)
     study = Factory(:study, investigation: investigation, contributor: @current_person)
     @assay = Factory(:assay, study: study, contributor: @current_person)
@@ -23,7 +27,10 @@ class ModelCUDTest < ActionDispatch::IntegrationTest
     template = ERB.new(File.read(template_file))
     @to_post = JSON.parse(template.result(binding))
 
-    model = Factory(:model, policy: Factory(:public_policy), contributor: @current_person, creators: [@creator])
+    model = Factory(:model, policy: Factory(:public_policy),
+                    contributor: @current_person, creators: [@creator],
+                    discussion_links:[Factory(:discussion_link)])
+    @discussion_link = model.discussion_links.first
     @to_patch = load_template("patch_min_#{@clz}.json.erb", {id: model.id})
   end
 

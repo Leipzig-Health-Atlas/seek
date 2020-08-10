@@ -80,12 +80,24 @@ class Model < ApplicationRecord
     end
   end
 
+  # the api treats organisms as plural, but we only want one.
+  # FIXME:ParameterConvert doesn't discriminate between Models, so couldn't handle it there
+  def organism_ids= ids
+    self.organism_id = ids.try(:first)
+  end
+
   def organism_terms
     if organism
       organism.searchable_terms
     else
       []
     end
+  end
+
+  # the api treats human diseases as plural, but we only want one.
+  # FIXME:ParameterConvert doesn't discriminate between Models, so couldn't handle it there
+  def human_disease_ids= ids
+    self.human_disease_id = ids.try(:first)
   end
 
   def human_disease_terms
