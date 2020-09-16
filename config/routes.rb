@@ -517,7 +517,7 @@ SEEK::Application.routes.draw do
       post :update_metadata
       post :request_contact
     end
-    resources :people, :projects, :investigations, :assays, :studies, :models, :data_files, :documents, :presentations, :organisms, :events, :collections, only: [:index]
+    resources :people, :projects, :investigations, :assays, :studies, :models, :data_files, :documents, :presentations, :organisms, :human_diseases, :events, :collections, only: [:index]
   end
 
   resources :events, concerns: [:asset] do
