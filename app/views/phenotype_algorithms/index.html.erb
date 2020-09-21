@@ -1,0 +1,12 @@
+<%= index_title -%>
+
+<%
+   index_path = eval("#{controller_name}_path")
+   items ||= eval("@#{controller_name}")
+%>
+
+<% unless items.empty? %>
+  <%= render :partial => "resources_alphabetical_paginated", :object => items %>
+<% else %>
+  <%= no_items_to_list_text %>
+<% end %>

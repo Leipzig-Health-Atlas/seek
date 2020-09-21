@@ -119,3 +119,19 @@ textarea.form-control {
   border-right: 4px solid transparent;
   border-left: 4px solid transparent;
 }
+
+.border-top-0 {
+  border-top: none !important;
+}
+
+.border-bottom {
+  border-bottom: 2px solid #ddd !important;
+}
+
+.phenotype-icon-col {
+	min-width: 50px;
+}
+
+.phenotype-formula .btn {
+	padding: 4px;
+}

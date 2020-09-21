@@ -51,6 +51,7 @@ filestore_path:
 tagline_prefix:
 modelling_analysis_enabled:
 human_diseases_enabled:
+phenotype_algorithms_enabled:
 jerm_enabled:
 email_enabled:
 jws_enabled:
@@ -204,3 +205,5 @@ omniauth_elixir_aai_secret:
 omniauth_ldap_enabled:
 omniauth_ldap_config:
   encrypt: true
+lha_data_portal_url:
+lha_data_portal_param_name:

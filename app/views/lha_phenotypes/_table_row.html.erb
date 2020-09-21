@@ -1,0 +1,45 @@
+<tr id="<%= phenotype.title %>">
+	<% if phenotype.is_abstract? %>
+		<td>
+			<%== render_phenotype_datatype phenotype.datatype %>
+			<% if !phenotype.lha_phenotypes.empty? %>
+				<a class="clickable" data-target="#<%= phenotype.id %>_restrictions" data-toggle="collapse" aria-expanded="false">
+					<span class="expand_caret caret"></span>
+				</button>
+			<% end %>
+		</td>
+	<% else %>
+		<td></td>
+	<% end %>
+	<td><%= phenotype.title %></td>
+	<td><%= phenotype.description %></td>
+	<td><%= phenotype.unit %></td>
+	<td class="phenotype-formula"><%== render_phenotype_formula phenotype.formula, phenotype.variables %></td>
+	<td><%= phenotype.range %></td>
+	<td><%= phenotype.score %></td>
+	<td>
+		<% if query = phenotype.data_portal_query %>
+			<%= button_link_to(nil, 'show', query, html_options = { target: '_blank', title: 'Show in Data Portal' }) %>
+		<% end %>
+	</td>
+</tr>
+
+
+<% if !phenotype.lha_phenotypes.empty? %>
+	<tbody class="bg-info collapse border-bottom border-top-0" id="<%= phenotype.id %>_restrictions">
+		<% phenotype.lha_phenotypes.order(:index, :title).each do |sub_phenotype| %>
+			<%= render 'lha_phenotypes/table_row', phenotype: sub_phenotype %>
+		<% end %>
+	</tbody>
+<% end %>
+
+<style>
+	.expand_caret {
+		transform: scale(1.6);
+		margin-left: 8px;
+		margin-top: -4px;
+	}
+	a[aria-expanded='false'] > .expand_caret {
+		transform: scale(1.6) rotate(-90deg);
+	}
+</style>

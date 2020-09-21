@@ -58,11 +58,15 @@
       <% end %>
     <% end %>
 
-    <% if Seek::Config.human_diseases_enabled %>
+    <% if Seek::Config.human_diseases_enabled || Seek::Config.phenotype_algorithms_enabled %>
       <li role="presentation" class="dropdown-header"><%= t("menu.vocabularies") -%></li>
 
       <% if Seek::Config.human_diseases_enabled %>
         <li><%= link_to t("human_disease").pluralize, human_diseases_path %></li>
+      <% end %>
+
+      <% if Seek::Config.phenotype_algorithms_enabled %>
+        <li><%= link_to t("phenotype_algorithm").pluralize, phenotype_algorithms_path %></li>
       <% end %>
     <% end %>
   </ul>

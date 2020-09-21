@@ -1,0 +1,30 @@
+<%= index_title -%>
+
+<h2><%= @phenotype_algorithm.title %></h2>
+
+<%= item_description @phenotype_algorithm.description, label: 'Description' %>
+
+
+<div>
+  <ul class="nav nav-tabs" role="tablist">
+    <% index = 0 %>
+    <% @phenotype_algorithm.phenotype_groups.order(:index).each do |phenotype_group| %>
+      <li role="presentation" class="<%= index == 0 ? 'active' : '' %>">
+        <a href="#<%= phenotype_group.id %>" aria-controls="<%= phenotype_group.id %>%" role="tab" data-toggle="tab">
+          <%= phenotype_group.title %>
+        </a>
+      </li>
+      <% index += 1 %>
+    <% end %>
+  </ul>
+
+  <div class="tab-content">
+    <% index = 0 %>
+    <% @phenotype_algorithm.phenotype_groups.order(:index, :title).each do |phenotype_group| %>
+      <div role="tabpanel" class="tab-pane <%= index == 0 ? 'active' : '' %>" id="<%= phenotype_group.id %>">
+        <%= render 'phenotype_groups/tab_content', phenotype_group: phenotype_group %>
+      </div>
+      <% index += 1 %>
+    <% end %>
+  </div>
+</div>

@@ -89,6 +89,7 @@ class AdminController < ApplicationController
     Seek::Config.publications_enabled = string_to_boolean params[:publications_enabled]
     Seek::Config.samples_enabled = string_to_boolean params[:samples_enabled]
     Seek::Config.workflows_enabled = string_to_boolean params[:workflows_enabled]
+    Seek::Config.phenotype_algorithms_enabled = string_to_boolean params[:phenotype_algorithms_enabled]
 
     Seek::Config.exception_notification_recipients = params[:exception_notification_recipients]
     Seek::Config.exception_notification_enabled = string_to_boolean params[:exception_notification_enabled]

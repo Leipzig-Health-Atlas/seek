@@ -42,6 +42,7 @@ en:
   scale: "Scale"
   organism: "Organism"
   human_disease: "Human Disease"
+  phenotype_algorithm: "Phenotype Algorithm"
 
   person: "Person"
   project: "Project"

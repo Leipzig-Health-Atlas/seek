@@ -1,0 +1,22 @@
+<%= item_description phenotype_group.description, label: 'Description' %>
+
+<table class="table table-condensed">
+	<thead>
+		<tr>
+			<th class="phenotype-icon-col"><!-- Datatype --></th>
+			<th>ID</th>
+			<th>Title</th>
+			<th>Unit</th>
+			<th>Formula</th>
+			<th>Range</th>
+			<th>Score</th>
+			<th><!-- Link to LHA Data Portal --></th>
+		</tr>
+	</thead>
+
+	<tbody>
+		<% phenotype_group.lha_phenotypes.where(lha_phenotype: nil).order(:index, :title).each do |phenotype| %>
+			<%= render 'lha_phenotypes/table_row', phenotype: phenotype %>
+		<% end %>
+	</tbody>
+</table>

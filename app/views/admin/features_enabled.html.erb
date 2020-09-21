@@ -69,6 +69,9 @@
                            "The URL of a #{link_to('CWL Viewer', 'https://github.com/common-workflow-language/cwlviewer', target: :_blank)} instance to generate diagrams for CWL workflows.") %>
   </div>
 
+  <%= admin_checkbox_setting(:phenotype_algorithms_enabled, 1, Seek::Config.phenotype_algorithms_enabled,
+                             "Phenotype algorithms enabled", "Whether phenotype algorithms are displayed to the users.") %>
+
   <h2>Integrations</h2>
   <%= admin_checkbox_setting(:jws_enabled, 1, Seek::Config.jws_enabled,
                              "JWS Online enabled", "Whether integration with JWS Online is enabled. Enabling this allows simulation of SBML models with JWS Online.",
