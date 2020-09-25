@@ -419,7 +419,7 @@ SEEK::Application.routes.draw do
         post :create_from_existing
       end
     end
-    resources :people, :projects, :investigations, :assays, :samples, :studies, :publications, :events, :collections, only: [:index]
+    resources :people, :projects, :investigations, :assays, :samples, :studies, :publications, :events, :collections, :human_diseases, only: [:index]
   end
 
   resources :presentations, concerns: [:has_content_blobs, :publishable, :has_versions, :asset] do
