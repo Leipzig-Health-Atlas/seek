@@ -554,7 +554,7 @@ SEEK::Application.routes.draw do
     collection do
       post :search_ajax
     end
-    resources :projects, :assays, :studies, :models, :publications, only: [:index]
+    resources :projects, :assays, :studies, :models, :publications, :data_files, only: [:index]
     member do
       get :visualise
       get :tree
