@@ -89,8 +89,8 @@ module HumanDiseasesHelper
         untagged: {
           projects:     Project.left_outer_joins(:human_diseases).where(human_diseases: { id: nil }).count(),
           publications: Publication.left_outer_joins(:human_diseases).where(human_diseases: { id: nil }).count(),
-          data_files:   DataFile.left_outer_joins(:human_diseases).where(human_diseases: { id: nil }).count(),
           models:       Model.where(human_disease: nil).count(),
+          data_files:   DataFile.left_outer_joins(:human_diseases).where(human_diseases: { id: nil }).count(),
         },
       }
     end
