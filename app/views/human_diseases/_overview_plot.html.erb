@@ -1,5 +1,7 @@
 <%
-  dataframe = get_human_diseases_plot_data()
+  data     = get_human_diseases_plot_data()
+  tagged   = data[:tagged]
+  untagged = data[:untagged]
 %>
 
 <div class="row hidden-xs hidden-sm">
@@ -10,6 +12,10 @@
       </div>
       <div class="panel-body">
         <div id="human-disease-graph"></div>
+        <small class="text-muted">
+          Untagged:<br>
+          <%= untagged.map{ |key, value| key.to_s.humanize + ': ' + value.to_s }.join(', ') %>
+        </small>
       </div>
     </div>
   </div>
@@ -32,11 +38,11 @@
     <% plots.each do |plot| %>
       {
         type: 'sunburst',
-        ids:       [ <%== dataframe.map{ |c| '"' + c[:id]     + '"' }.join(', ') %> ],
-        labels:    [ <%== dataframe.map{ |c| '"' +            + '"' }.join(', ') %> ],
-        parents:   [ <%== dataframe.map{ |c| '"' + c[:parent] + '"' }.join(', ') %> ],
-        values:    [ <%== dataframe.map{ |c|       c[plot[:key]]    }.join(', ') %> ],
-        hovertext: [ <%== dataframe.map{ |c| '"' + c[:title]  + '"' }.join(', ') %> ],
+        ids:       [ <%== tagged.map{ |c| '"' + c[:id]     + '"' }.join(', ') %> ],
+        labels:    [ <%== tagged.map{ |c| '"' +            + '"' }.join(', ') %> ],
+        parents:   [ <%== tagged.map{ |c| '"' + c[:parent] + '"' }.join(', ') %> ],
+        values:    [ <%== tagged.map{ |c|       c[plot[:key]]    }.join(', ') %> ],
+        hovertext: [ <%== tagged.map{ |c| '"' + c[:title]  + '"' }.join(', ') %> ],
         outsidetextfont: { size: 20, color: '#377eb8' },
         leaf: { opacity: 1 },
         marker: { line: { width: 2 } },

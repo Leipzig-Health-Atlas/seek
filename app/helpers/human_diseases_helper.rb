@@ -72,19 +72,27 @@ module HumanDiseasesHelper
   end
 
   def get_human_diseases_plot_data()
-    Rails.cache.fetch('human_diseases_plot_data', expires_in: 12.hours) do
-      HumanDisease.all.order(:id).map do |c|
-        {
-          id:           c.id.to_s,
-          title:        c.title,
-          parent:       c.parents.first ? c.parents.first.id.to_s : '',
-          projects:     c.projects.count,
-          # assays:       c.assays.count, # currently not in use
-          publications: c.publications.count,
-          models:       c.models.count,
-          data_files:   c.data_files.count,
-        }
-      end
+    Rails.cache.fetch('human_diseases_data', expires_in: 12.hours) do
+      {
+        tagged:
+          HumanDisease.all.order(:id).map do |c|
+            {
+              id:           c.id.to_s,
+              title:        c.title,
+              parent:       c.parents.first ? c.parents.first.id.to_s : '',
+              projects:     c.projects.count,
+              publications: c.publications.count,
+              models:       c.models.count,
+              data_files:   c.data_files.count,
+            }
+          end,
+        untagged: {
+          projects:     Project.left_outer_joins(:human_diseases).where(human_diseases: { id: nil }).count(),
+          publications: Publication.left_outer_joins(:human_diseases).where(human_diseases: { id: nil }).count(),
+          data_files:   DataFile.left_outer_joins(:human_diseases).where(human_diseases: { id: nil }).count(),
+          models:       Model.where(human_disease: nil).count(),
+        },
+      }
     end
   end
 end
