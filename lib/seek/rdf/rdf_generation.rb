@@ -100,7 +100,8 @@ module Seek
           'owl' => RDF::Vocab::OWL.to_uri.to_s,
           'foaf' => RDF::Vocab::FOAF.to_uri.to_s,
           'sioc' => RDF::Vocab::SIOC.to_uri.to_s,
-          'dcat' => RDF::Vocab::DCAT.to_uri.to_s
+          'dcat' => RDF::Vocab::DCAT.to_uri.to_s,
+          'prov' => RDF::Vocab::PROV.to_uri.to_s
         }
       end
 
