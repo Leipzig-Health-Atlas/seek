@@ -28,8 +28,9 @@ gem 'savon', '1.1.0'
 gem 'dynamic_form'
 gem 'delayed_job_active_record'
 gem 'daemons'
-gem 'linkeddata'
+gem 'linkeddata', '>= 3.1'
 gem 'rdf'
+gem 'rdf-vocab', '~> 3.1.13'
 
 gem 'openseek-api'
 # for fancy content escaping in openbis integration
