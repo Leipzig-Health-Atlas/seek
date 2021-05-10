@@ -32,6 +32,7 @@ module Seek
         acts_as_authorized
         acts_as_uniquely_identifiable
         acts_as_favouritable
+        acts_as_discussable
         grouped_pagination
         title_trimmer
 
@@ -100,8 +101,7 @@ module Seek
         versioned? &&
           is_downloadable? &&
           !(respond_to?(:extracted_samples) && extracted_samples.any?) &&
-          !(respond_to?(:openbis?) && openbis?) &&
-          !(supports_doi? && has_doi?)
+          !(respond_to?(:openbis?) && openbis?)
       end
     end
   end

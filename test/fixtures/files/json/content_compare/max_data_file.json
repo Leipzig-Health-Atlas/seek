@@ -35,7 +35,12 @@
           "size": 8827
         }
       ],
-      "other_creators" : "Blogs, Joe"
+      "other_creators" : "Blogs, Joe",
+      "discussion_links": [{
+        "id": 55,
+        "url": "http://www.slack.com/",
+        "label": "Slack"
+      }]
     },
     "relationships": {
       "creators": {

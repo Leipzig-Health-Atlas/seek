@@ -36,11 +36,15 @@ module SessionsHelper
     Seek::Config.omniauth_enabled && Seek::Config.omniauth_providers.any?
   end
 
-  def show_elixir_login?
+  def show_elixir_aai_login?
     Seek::Config.omniauth_elixir_aai_enabled
   end
 
   def show_ldap_login?
     Seek::Config.omniauth_ldap_enabled
+  end
+
+  def show_github_login?
+    Seek::Config.omniauth_github_enabled
   end
 end

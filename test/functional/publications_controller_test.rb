@@ -1005,7 +1005,7 @@ class PublicationsControllerTest < ActionController::TestCase
     get :query_authors_typeahead, params: { format: :json, full_name: query }
     assert_response :success
     authors = JSON.parse(@response.body)
-    assert_equal 0, authors['data'].length
+    assert_equal 0, authors.length
   end
 
   test 'query authors for initialization' do
@@ -1204,6 +1204,23 @@ class PublicationsControllerTest < ActionController::TestCase
       assert_select "a[href=?]", person_path(person), text: person.name, count:0
       assert_select "a[href=?]", person_path(person), text: original_full_name
     end
+  end
+
+  test 'list of investigations unique' do
+    #investigation should only be listed once even if in multiple matching projects
+    person = Factory(:person_in_multiple_projects)
+    assert person.projects.count > 1
+    investigation = Factory(:investigation,projects:person.projects,contributor:person)
+    publication = Factory(:publication, contributor:person)
+    login_as(person)
+
+    get :manage, params: { id: publication}
+    assert_response :success
+
+    assert_select 'select#possible_publication_investigation_ids' do
+      assert_select 'option[value=?]',investigation.id.to_s,count:1
+    end
+
   end
 
   private

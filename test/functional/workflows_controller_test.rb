@@ -65,7 +65,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     workflow = Factory :workflow, contributor: User.current_user.person
 
     assert_difference 'workflow.version' do
-      post :new_version, params: { id: workflow, workflow: {}, content_blobs: [{ data_url: 'http://somewhere.com/piccy.png' }] }
+      post :create_version, params: { id: workflow, workflow: {}, content_blobs: [{ data_url: 'http://somewhere.com/piccy.png' }] }
 
       workflow.reload
     end
@@ -81,7 +81,7 @@ class WorkflowsControllerTest < ActionController::TestCase
 
     new_file_path = file_for_upload
     assert_difference 'workflow.version' do
-      post :new_version, params: { id: workflow, workflow: {}, content_blobs: [{ data: new_file_path }] }
+      post :create_version, params: { id: workflow, workflow: {}, content_blobs: [{ data: new_file_path }] }
 
       workflow.reload
     end
@@ -103,7 +103,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     workflow = Factory :workflow, contributor: User.current_user.person
     new_data_url = 'http://www.blah.de/images/liver-illustration.png'
     assert_no_difference 'workflow.version' do
-      post :new_version, params: { id: workflow, workflow: {}, content_blobs: [{ data_url: new_data_url }] }
+      post :create_version, params: { id: workflow, workflow: {}, content_blobs: [{ data_url: new_data_url }] }
 
       workflow.reload
     end
@@ -439,6 +439,18 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_equal 12, session[:metadata][:internals][:inputs].length
   end
 
+  test 'extract metadata from remote should perform inline and cancel remote content fetch job' do
+    mock_remote_file "#{Rails.root}/test/fixtures/files/workflows/rp2-to-rp2path-packed.cwl", 'https://www.abc.com/workflow.cwl'
+    cwl = Factory(:cwl_workflow_class)
+    blob = Factory(:url_cwl_content_blob)
+    blob.remote_content_fetch_task.start
+    session[:uploaded_content_blob_id] = blob.id.to_s
+    post :metadata_extraction_ajax, params: { content_blob_id: blob.id.to_s, format: 'js', workflow_class_id: cwl.id }
+    assert blob.reload.remote_content_fetch_task.cancelled?
+    assert_response :success
+    assert_equal 12, session[:metadata][:internals][:inputs].length
+  end
+
   test 'missing diagram and no CWL viewer available returns 404' do
     wf = Factory(:cwl_workflow)
     login_as(wf.contributor)
@@ -525,6 +537,22 @@ class WorkflowsControllerTest < ActionController::TestCase
     end
   end
 
+  test 'handles error when generating diagram from CWL' do
+    with_config_value(:cwl_viewer_url, 'http://localhost:8080/cwl_viewer') do
+      wf = Factory(:generated_galaxy_no_diagram_ro_crate_workflow)
+      login_as(wf.contributor)
+      refute wf.diagram_exists?
+      assert wf.can_render_diagram?
+
+      VCR.use_cassette('workflows/cwl_viewer_error') do
+        get :diagram, params: { id: wf.id }
+      end
+
+      assert_response :not_found
+      refute wf.diagram_exists?
+    end
+  end
+
   test 'does not render diagram if not in RO crate' do
     wf = Factory(:nf_core_ro_crate_workflow)
     login_as(wf.contributor)
@@ -558,14 +586,46 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_equal 'file%20with%20spaces%20in%20name.txt', crate_workflow.id
   end
 
-  test 'downloads valid RO crate' do
+  test 'downloads valid generated RO crate' do
     workflow = Factory(:generated_galaxy_ro_crate_workflow, policy: Factory(:public_policy))
 
     get :ro_crate, params: { id: workflow.id }
 
     assert_response :success
-    crate = ROCrate::WorkflowCrateReader.read_zip(response.stream.to_path)
-    assert crate.main_workflow
+    assert @response.header['Content-Length'].present?
+    assert @response.header['Content-Length'].to_i > 5000 # Length is variable because the crate contains variable data
+    Dir.mktmpdir do |dir|
+      crate = ROCrate::WorkflowCrateReader.read_zip(response.stream.to_path, target_dir: dir)
+      assert crate.main_workflow
+    end
+  end
+
+  test 'downloads valid existing RO crate' do
+    workflow = Factory(:existing_galaxy_ro_crate_workflow, policy: Factory(:public_policy))
+
+    get :ro_crate, params: { id: workflow.id }
+
+    assert_response :success
+    assert @response.header['Content-Length'].present?
+    assert @response.header['Content-Length'].to_i > 5000 # Length is variable because the crate contains variable data
+    Dir.mktmpdir do |dir|
+      crate = ROCrate::WorkflowCrateReader.read_zip(response.stream.to_path, target_dir: dir)
+      assert crate.main_workflow
+    end
+  end
+
+  test 'downloads valid RO crate for single workflow file' do
+    workflow = Factory(:cwl_packed_workflow, policy: Factory(:public_policy))
+
+    get :ro_crate, params: { id: workflow.id }
+
+    assert_response :success
+    assert @response.header['Content-Length'].present?
+    assert @response.header['Content-Length'].to_i > 2000 # Length is variable because the crate contains variable data
+    Dir.mktmpdir do |dir|
+      crate = ROCrate::WorkflowCrateReader.read_zip(response.stream.to_path, target_dir: dir)
+      assert crate.main_workflow
+    end
   end
 
   test 'create ro crate even with with duplicated filenames' do
@@ -594,7 +654,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     login_as(person)
     blob = Factory(:content_blob)
     session[:uploaded_content_blob_id] = blob.id
-    workflow =  {title: 'workflow', project_ids: [person.projects.first.id], discussion_links_attributes:[{url: "http://www.slack.com/"}]}
+    workflow =  {title: 'workflow', project_ids: [person.projects.first.id], discussion_links_attributes:[{url: "http://www.slack.com/", label:'our slack'}]}
     assert_difference('AssetLink.discussion.count') do
       assert_difference('Workflow.count') do
           post :create_metadata, params: {workflow: workflow, content_blob_id: blob.id.to_s, policy_attributes: { access_type: Policy::VISIBLE }}
@@ -602,18 +662,44 @@ class WorkflowsControllerTest < ActionController::TestCase
     end
     workflow = assigns(:workflow)
     assert_equal 'http://www.slack.com/', workflow.discussion_links.first.url
+    assert_equal 'our slack',workflow.discussion_links.first.label
     assert_equal AssetLink::DISCUSSION, workflow.discussion_links.first.link_type
   end
 
-
-  test 'should show discussion link' do
+  test 'should show discussion link without label' do
     asset_link = Factory(:discussion_link)
+    workflow = Factory(:workflow, discussion_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    assert_equal [asset_link],workflow.discussion_links
+    get :show, params: { id: workflow }
+    assert_response :success
+    assert_select 'div.panel-heading', text: /Discussion Channel/, count: 1
+    assert_select 'div.discussion-link', count:1 do
+      assert_select 'a[href=?]',asset_link.url,text:asset_link.url
+    end
+
+    #blank rather than nil
+    asset_link.update_column(:label,'')
+    workflow.reload
+    assert_equal [asset_link],workflow.discussion_links
+    get :show, params: { id: workflow }
+    assert_response :success
+    assert_select 'div.panel-heading', text: /Discussion Channel/, count: 1
+    assert_select 'div.discussion-link', count:1 do
+      assert_select 'a[href=?]',asset_link.url,text:asset_link.url
+    end
+  end
+
+
+  test 'should show discussion link with label' do
+    asset_link = Factory(:discussion_link, label:'discuss-label')
     workflow = Factory(:workflow, discussion_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE))
     get :show, params: { id: workflow }
     assert_response :success
     assert_select 'div.panel-heading', text: /Discussion Channel/, count: 1
+    assert_select 'div.discussion-link', count:1 do
+      assert_select 'a[href=?]',asset_link.url,text:'discuss-label'
+    end
   end
-
 
   test 'should update workflow with new discussion link' do
     person = Factory(:person)
@@ -622,11 +708,12 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_nil workflow.discussion_links.first
     assert_difference('AssetLink.discussion.count') do
       assert_difference('ActivityLog.count') do
-        put :update, params: { id: workflow.id, workflow: { discussion_links_attributes:[{url: "http://www.slack.com/"}] } }
+        put :update, params: { id: workflow.id, workflow: { discussion_links_attributes:[{url: "http://www.slack.com/", label:'our slack'}] } }
       end
     end
     assert_redirected_to workflow_path(workflow = assigns(:workflow))
     assert_equal 'http://www.slack.com/', workflow.discussion_links.first.url
+    assert_equal 'our slack',workflow.discussion_links.first.label
   end
 
   test 'should update workflow with edited discussion link' do
@@ -656,6 +743,66 @@ class WorkflowsControllerTest < ActionController::TestCase
     end
     assert_redirected_to workflow_path(workflow = assigns(:workflow))
     assert_empty workflow.discussion_links
+  end
+
+  test 'should be able to handle remote files when creating RO crate' do
+    mock_remote_file "#{Rails.root}/test/fixtures/files/file with spaces in name.txt", 'https://raw.githubusercontent.com/bob/workflow/master/workflow.txt'
+    mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png", 'https://raw.githubusercontent.com/bob/workflow/master/diagram.png'
+    mock_remote_file "#{Rails.root}/test/fixtures/files/workflows/rp2-to-rp2path-packed.cwl", 'https://raw.githubusercontent.com/bob/workflow/master/abstract.cwl'
+
+    cwl = Factory(:cwl_workflow_class)
+    person = Factory(:person)
+    login_as(person)
+    assert_difference('ContentBlob.count') do
+      post :create_ro_crate, params: {
+          ro_crate: {
+              workflow: { data_url: 'https://github.com/bob/workflow/blob/master/workflow.txt' },
+              diagram: { data_url: 'https://github.com/bob/workflow/blob/master/diagram.png' },
+              abstract_cwl: { data_url: 'https://github.com/bob/workflow/blob/master/abstract.cwl' }
+          },
+          workflow_class_id: cwl.id
+      }
+    end
+    assert_response :success
+    assert wf = assigns(:workflow)
+    crate_workflow = wf.ro_crate.main_workflow
+    assert crate_workflow
+    assert_equal 'workflow.txt', crate_workflow.id
+  end
+
+  test 'create new version of a workflow' do
+    person = Factory(:person)
+    login_as(person)
+    workflow = Factory(:workflow, contributor: person)
+    blob = Factory(:nf_core_ro_crate)
+    session[:uploaded_content_blob_id] = blob.id
+    workflow_params =  { title: 'workflow', project_ids: [person.projects.first.id] }
+    assert_equal 1, workflow.version
+    old_blob = workflow.content_blob
+
+    assert_no_difference('ContentBlob.count') do
+      assert_difference('Workflow::Version.count') do
+        post :create_version_metadata, params: { id: workflow.id, workflow: workflow_params, content_blob_id: blob.id.to_s }
+      end
+    end
+
+    workflow = assigns(:workflow)
+    assert_equal 2, workflow.version
+    assert_equal old_blob, workflow.versions.first.content_blob
+    assert_equal blob, workflow.versions.last.content_blob
+  end
+
+  test 'should be able to handle remote files in existing RO crate' do
+    mock_remote_file "#{Rails.root}/test/fixtures/files/file with spaces in name.txt", 'https://raw.githubusercontent.com/bob/workflow/master/workflow.txt'
+    mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png", 'https://raw.githubusercontent.com/bob/workflow/master/diagram.png'
+    mock_remote_file "#{Rails.root}/test/fixtures/files/workflows/rp2-to-rp2path-packed.cwl", 'https://raw.githubusercontent.com/bob/workflow/master/abstract.cwl'
+
+    galaxy = Factory(:galaxy_workflow_class)
+    blob = Factory(:fully_remote_ro_crate)
+    session[:uploaded_content_blob_id] = blob.id.to_s
+    post :metadata_extraction_ajax, params: { content_blob_id: blob.id.to_s, format: 'js', workflow_class_id: galaxy.id }
+    assert_response :success
+    assert_equal 12, session[:metadata][:internals][:inputs].length
   end
 
   def edit_max_object(workflow)
