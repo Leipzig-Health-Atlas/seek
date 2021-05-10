@@ -104,6 +104,26 @@ class DocumentsControllerTest < ActionController::TestCase
     assert_redirected_to document_path(assigns(:document))
   end
 
+  test 'should create document version' do
+    document = Factory(:document)
+    login_as(document.contributor)
+
+    assert_difference('ActivityLog.count') do
+      assert_no_difference('Document.count') do
+        assert_difference('Document::Version.count') do
+          assert_difference('ContentBlob.count') do
+            post :create_version, params: { id: document.id, content_blobs: [{ data: fixture_file_upload('files/little_file.txt') }], revision_comments: 'new version!' }
+          end
+        end
+      end
+    end
+
+    assert_redirected_to document_path(assigns(:document))
+    assert_equal 2, assigns(:document).version
+    assert_equal 2, assigns(:document).versions.count
+    assert_equal 'new version!', assigns(:document).latest_version.revision_comments
+  end
+
   test 'should create and link to event' do
     person = Factory(:person)
     login_as(person)
@@ -168,6 +188,24 @@ class DocumentsControllerTest < ActionController::TestCase
     assert (doc = assigns(:document))
     assert_redirected_to document_path(doc)
     assert_equal [event],doc.events
+  end
+
+  test 'update with no assays' do
+    person = Factory(:person)
+    creators = [Factory(:person), Factory(:person)]
+    assay = Factory(:assay, contributor:person)
+    document = Factory(:document,assays:[assay], contributor: person, creators:creators)
+
+    login_as(person)
+
+    assert document.can_edit?
+    assert_difference('AssayAsset.count', -1) do
+      assert_difference('ActivityLog.count',1) do
+         put :update, params: { id: document.id, document: { title: 'Different title', project_ids: [person.projects.first.id], assay_assets_attributes: [""] } }
+      end
+    end
+    assert_empty assigns(:document).assays
+    assert_redirected_to document_path(document)
   end
 
   test 'should destroy document' do
@@ -1013,6 +1051,33 @@ class DocumentsControllerTest < ActionController::TestCase
     document = assigns(:document)
     assert_redirected_to document_path(document)
     assert_empty document.discussion_links
+  end
+
+  test 'should return to project page after destroy' do
+    person = Factory(:person)
+    project = Factory(:project)
+    document = Factory(:document, contributor: person, project_ids: [project.id])
+    login_as(person)
+    assert_difference('Document.count', -1) do
+      assert_no_difference('ContentBlob.count') do
+        delete :destroy, params: { id: document, return_to: project_path(project)}
+      end
+    end
+    assert_redirected_to project_path(project)
+  end
+
+  
+  test "shouldn't return to unauthorised host" do
+    person = Factory(:person)
+    project = Factory(:project)
+    document = Factory(:document, contributor: person, project_ids: [project.id])
+    login_as(person)
+    assert_difference('Document.count', -1) do
+      assert_no_difference('ContentBlob.count') do
+        delete :destroy, params: { id: document, return_to: "https://www.google.co.uk/"}
+      end
+    end
+    assert_redirected_to documents_path
   end
 
   private

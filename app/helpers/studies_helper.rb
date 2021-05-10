@@ -15,14 +15,12 @@ module StudiesHelper
   end
 
   def study_link(study)
-    unless study.nil?
-      if study.can_view?
-        link_to study.title, study
-      else
-        hidden_items_html [study]
-      end
-    else
+    if study.nil?
       "<span class='none_text'>Not associated with a Study</span>".html_safe
+    elsif study.can_view?
+      link_to study.title, study
+    else
+      hidden_items_html [study]
     end
   end
 
@@ -32,5 +30,9 @@ module StudiesHelper
 
   def study_type_text(study_type)
     study_type ? study_type.title : '<span class="none_text">Not specified</span>'.html_safe
+  end
+
+  def show_batch_miappe_button?
+    CustomMetadataType.where(supported_type: 'Study', title: 'MIAPPE metadata').any?
   end
 end

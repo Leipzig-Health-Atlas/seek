@@ -83,6 +83,19 @@ module Seek
 
     private
 
+    # Takes into account current view, and returns the appropriate max results per page
+    def get_results_per_page
+
+      condensed_view_count = is_condensed_view? ? Seek::Config.results_per_page_default_condensed : false
+
+      # Priorities for the results per page value
+      # per_page param > controller specific config > specific view default > general default
+      params[:per_page]&.to_i ||
+          Seek::Config.results_per_page_for(controller_name) ||
+          condensed_view_count ||
+          Seek::Config.results_per_page_default
+    end
+
     def assign_index_variables
       # Parent resource
       get_parent_resource
@@ -91,9 +104,7 @@ module Seek
       @page = page_and_sort_params[:page]
       @page ||= 'all' if json_api_request?
       @page ||= '1'
-      @per_page = params[:per_page]&.to_i ||
-          Seek::Config.results_per_page_for(controller_name) ||
-          Seek::Config.results_per_page_default
+      @per_page = get_results_per_page
 
       # Order
       @order = if page_and_sort_params[:sort]
@@ -107,6 +118,7 @@ module Seek
         @order = :updated_at_desc if @page == 'top' && Seek::ListSorter.options(controller_model.name).include?(:updated_at_desc)
         # Sort by `title` if on an alphabetical page, and its a valid sort option for this type.
         @order = :title_asc if @page.match?(/[?A-Z]+/) && Seek::ListSorter.options(controller_model.name).include?(:title_asc)
+        @order ||= :relevance if page_and_sort_params.dig(:filter, :query).present? && Seek::Config.solr_enabled
         @order ||= Seek::Config.sorting_for(controller_name)&.to_sym
         @order ||= Seek::ListSorter.key_for_view(controller_model.name, :index)
       end

@@ -46,7 +46,7 @@ class Publication < ApplicationRecord
 
   validates :doi, format: { with: VALID_DOI_REGEX, message: 'is invalid' }, allow_blank: true
   validates :pubmed_id, numericality: { greater_than: 0, message: 'is invalid' }, allow_blank: true
-  validates :publication_type_id, presence: true
+  validates :publication_type_id, presence: true, on: :create
 
   # validation differences between OpenSEEK and the VLN SEEK
   validates_uniqueness_of :pubmed_id, allow_nil: true, allow_blank: true, if: -> { Seek::Config.is_virtualliver }
@@ -110,6 +110,14 @@ class Publication < ApplicationRecord
 
     def event_ids=(events_ids); end
 
+  end
+
+  # Returns the columns to be shown on the table view for the resource
+  def columns_default
+    super + ['published_date','journal']
+  end
+  def columns_allowed
+    columns_default + ['abstract','last_used_at','doi','citation','deleted_contributor','registered_mode','booktitle','publisher','editor','url']
   end
 
   def pubmed_uri

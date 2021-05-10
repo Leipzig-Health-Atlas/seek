@@ -33,6 +33,7 @@
 //= require search
 //= require tooltips
 //= require sample_types
+//= require controlled_vocabs
 //= require wizard_step
 //= require DataTables-1.10.11/jquery.dataTables
 //= require DataTables-1.10.11/dataTables.bootstrap
@@ -57,3 +58,5 @@
 //= require i18n
 //= require i18n/translations
 //= require_tree ./templates
+//= require simplemde.min
+//= require admin

@@ -78,13 +78,13 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
     expected = {
       '@context' => 'http://schema.org',
-      '@type' => 'DataSet',
+      '@type' => 'Dataset',
       '@id' => "http://localhost:3000/data_files/#{df.id}",
       'name' => df.title,
       'description' => df.description,
       'keywords' => 'keyword',
-      'creator' => [{ '@type' => 'Person', 'name' => 'Blogs' }, { '@type' => 'Person', 'name' => 'Joe' }],
       'url' => "http://localhost:3000/data_files/#{df.id}",
+      'creator' => [{ '@type' => 'Person', 'name' => 'Blogs' }, { '@type' => 'Person', 'name' => 'Joe' }],
       'producer' => [{
         '@type' => %w[Project Organization],
         '@id' => "http://localhost:3000/projects/#{@project.id}",
@@ -112,6 +112,50 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     assert_equal expected, json
   end
 
+  test 'dataset without content blob' do
+    df = travel_to(@current_time) do
+      df = Factory(:max_data_file, contributor: @person, projects: [@project], policy: Factory(:public_policy), doi: '10.10.10.10/test.1')
+      df.add_annotations('keyword', 'tag', User.first)
+      df.content_blob=nil
+      disable_authorization_checks { 
+        df.content_blob=nil
+        df.save! 
+      }
+      df
+    end
+    
+    df.reload
+    assert_nil df.content_blob
+
+    expected = {
+      '@context' => 'http://schema.org',
+      '@type' => 'Dataset',
+      '@id' => "http://localhost:3000/data_files/#{df.id}",
+      'name' => df.title,
+      'description' => df.description,
+      'keywords' => 'keyword',
+      'url' => "http://localhost:3000/data_files/#{df.id}",
+      'creator' => [{ '@type' => 'Person', 'name' => 'Blogs' }, { '@type' => 'Person', 'name' => 'Joe' }],
+      'producer' => [{
+        '@type' => %w[Project Organization],
+        '@id' => "http://localhost:3000/projects/#{@project.id}",
+        'name' => @project.title
+      }],
+      'dateCreated' => @current_time.to_s,
+      'dateModified' => @current_time.to_s,      
+      'identifier' => 'https://doi.org/10.10.10.10/test.1',
+      'subjectOf' => [
+        { '@type' => 'Event',
+          '@id' => "http://localhost:3000/events/#{df.events.first.id}",
+          'name' => df.events.first.title }
+      ]
+    }
+
+    json = JSON.parse(df.to_schema_ld)
+    assert_equal expected, json
+    
+  end
+
   test 'dataset with weblink' do
     df = travel_to(@current_time) do
       df = Factory(:max_data_file, content_blob: Factory(:website_content_blob),
@@ -127,7 +171,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
     expected = {
       '@context' => 'http://schema.org',
-      '@type' => 'DataSet',
+      '@type' => 'Dataset',
       '@id' => "http://localhost:3000/data_files/#{df.id}",
       'name' => df.title,
       'description' => df.description,
@@ -323,7 +367,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     end
 
     expected = { '@context' => 'http://schema.org',
-                 '@type' => 'Workflow',
+                 '@type' => 'ComputationalWorkflow',
                  '@id' => "http://localhost:3000/workflows/#{workflow.id}",
                  'description' => 'This is a test workflow for bioschema generation',
                  'name' => 'This workflow',
@@ -354,38 +398,38 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
                        'name' => @person.name }],
                  'version' => 1,
                  'programmingLanguage' => 'CWL workflow',
-                 'inputs' => [
-                   { '@type' => 'PropertyValueSpecification',
+                 'input' => [
+                   { '@type' => 'FormalParameter',
                      'name' => '#main/input.cofsfile' },
-                   { '@type' => 'PropertyValueSpecification',
+                   { '@type' => 'FormalParameter',
                      'name' => '#main/input.dmax' },
-                   { '@type' => 'PropertyValueSpecification',
+                   { '@type' => 'FormalParameter',
                      'name' => '#main/input.dmin' },
-                   { '@type' => 'PropertyValueSpecification',
+                   { '@type' => 'FormalParameter',
                      'name' => '#main/input.max-steps' },
-                   { '@type' => 'PropertyValueSpecification',
+                   { '@type' => 'FormalParameter',
                      'name' => '#main/input.mwmax-cof' },
-                   { '@type' => 'PropertyValueSpecification',
+                   { '@type' => 'FormalParameter',
                      'name' => '#main/input.mwmax-source' },
-                   { '@type' => 'PropertyValueSpecification',
+                   { '@type' => 'FormalParameter',
                      'name' => '#main/input.rulesfile' },
-                   { '@type' => 'PropertyValueSpecification',
+                   { '@type' => 'FormalParameter',
                      'name' => '#main/input.sinkfile' },
-                   { '@type' => 'PropertyValueSpecification',
+                   { '@type' => 'FormalParameter',
                      'name' => '#main/input.sourcefile' },
-                   { '@type' => 'PropertyValueSpecification',
+                   { '@type' => 'FormalParameter',
                      'name' => '#main/input.std_mode' },
-                   { '@type' => 'PropertyValueSpecification',
+                   { '@type' => 'FormalParameter',
                      'name' => '#main/input.stereo_mode' },
-                   { '@type' => 'PropertyValueSpecification',
+                   { '@type' => 'FormalParameter',
                      'name' => '#main/input.topx' }
                  ],
-                 'outputs' => [
-                   { '@type' => 'PropertyValueSpecification',
+                 'output' => [
+                   { '@type' => 'FormalParameter',
                      'name' => '#main/solutionfile' },
-                   { '@type' => 'PropertyValueSpecification',
+                   { '@type' => 'FormalParameter',
                      'name' => '#main/sourceinsinkfile' },
-                   { '@type' => 'PropertyValueSpecification',
+                   { '@type' => 'FormalParameter',
                      'name' => '#main/stdout' }
                  ] }
 
