@@ -119,8 +119,7 @@ SEEK::Application.routes.draw do
       get :settings
       get :get_stats
       get :registration_form
-      get :edit_tag
-      get :project_creation_requests
+      get :edit_tag      
       post :update_home_settings
       post :restart_server
       post :restart_delayed_job
@@ -149,6 +148,7 @@ SEEK::Application.routes.draw do
       get :privacy
       get :about
       get :create_or_join_project
+      get :report_issue
     end
   end
 
@@ -287,6 +287,8 @@ SEEK::Application.routes.draw do
       get :administer_create_project_request
       post :respond_create_project_request
       get :project_join_requests
+      get :project_creation_requests
+      get  :typeahead
     end
     member do
       get :asset_report
@@ -357,6 +359,7 @@ SEEK::Application.routes.draw do
   resources :institutions do
     collection do
       get :request_all
+      get :request_all_sharing_form
       post :items_for_result
       get  :typeahead
     end
@@ -717,6 +720,7 @@ SEEK::Application.routes.draw do
   post '/auth/:provider' => 'sessions#create', as: :omniauth_authorize # For security, ONLY POST should be enabled on this route.
   match '/auth/:provider/callback' => 'sessions#create', as: :omniauth_callback, via: [:get, :post] # Callback routes need both GET and POST enabled.
   match '/identities/auth/:provider/callback' => 'sessions#create', via: [:get, :post] # Needed for legacy support..
+  get '/auth/failure' => 'sessions#omniauth_failure', as: :omniauth_failure
 
   get '/activate(/:activation_code)' => 'users#activate', as: :activate
   get '/forgot_password' => 'users#forgot_password', as: :forgot_password
