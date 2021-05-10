@@ -8,8 +8,6 @@ class PhenotypeAlgorithmsController < ApplicationController
 
 	cache_sweeper :human_diseases_sweeper, only: [ :update, :create, :destroy ]
 
-	include Seek::BreadCrumbs
-
 	# GET /phenotype_algorithms
 	# GET /phenotype_algorithms.json
 	def index
