@@ -823,7 +823,7 @@ ActiveRecord::Schema.define(version: 2021_03_18_115608) do
     t.index ["project_id"], name: "index_investigations_projects_on_project_id"
   end
 
-  create_table "lha_phenotypes", force: :cascade do |t|
+  create_table "lha_phenotypes", id: :string, force: :cascade do |t|
     t.text     "title",                                                          null: false
     t.text     "description"
     t.string   "datatype",           limit: 50
@@ -1204,14 +1204,14 @@ ActiveRecord::Schema.define(version: 2021_03_18_115608) do
     t.index ["policy_id"], name: "index_permissions_on_policy_id"
   end
 
-  create_table "phenotype_algorithms", force: :cascade do |t|
+  create_table "phenotype_algorithms", id: :string, force: :cascade do |t|
     t.text     "title",                                       null: false
     t.text     "description"
     t.datetime "created_at",  default: '2019-06-17 09:33:24', null: false
     t.datetime "updated_at",  default: '2019-06-17 09:33:24', null: false
   end
 
-  create_table "phenotype_groups", force: :cascade do |t|
+  create_table "phenotype_groups", id: :string, force: :cascade do |t|
     t.text     "title",                                                  null: false
     t.text     "description"
     t.integer  "index"
