@@ -1,5 +1,6 @@
 class PhenotypeAlgorithm < ActiveRecord::Base
   include Seek::Search::BackgroundReindexing
+  include Seek::Favouritable
 
   acts_as_favouritable
 
