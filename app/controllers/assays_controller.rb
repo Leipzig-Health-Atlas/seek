@@ -13,8 +13,6 @@ class AssaysController < ApplicationController
 
   include Seek::Publishing::PublishingCommon
 
-  include Seek::BreadCrumbs
-
   include Seek::IsaGraphExtensions
 
   api_actions :index, :show, :create, :update, :destroy
@@ -175,7 +173,9 @@ class AssaysController < ApplicationController
                                   { scales: [] }, { sop_ids: [] }, { model_ids: [] },
                                   { samples_attributes: [:asset_id, :direction] },
                                   { data_files_attributes: [:asset_id, :direction, :relationship_type_id] },
-                                  { publication_ids: [] }, { human_disease_ids: [] }
+                                  { publication_ids: [] }, { human_disease_ids: [] },
+                                  { custom_metadata_attributes: determine_custom_metadata_keys },
+                                  { discussion_links_attributes:[:id, :url, :label, :_destroy] }
                                   ).tap do |assay_params|
       assay_params[:document_ids].select! { |id| Document.find_by_id(id).try(:can_view?) } if assay_params.key?(:document_ids)
       assay_params[:sop_ids].select! { |id| Sop.find_by_id(id).try(:can_view?) } if assay_params.key?(:sop_ids)

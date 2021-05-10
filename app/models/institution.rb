@@ -32,6 +32,14 @@ class Institution < ApplicationRecord
     end
   end
 
+  # Returns the columns to be shown on the table view for the resource
+  def columns_default
+    super + ['city','country','web_page']
+  end
+  def columns_allowed
+    columns_default + ['address']
+  end
+
   # get a listing of all known institutions
   def self.get_all_institutions_listing
     Institution.all.collect { |i| [i.title, i.id] }

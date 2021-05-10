@@ -11,8 +11,7 @@ class InstitutionsController < ApplicationController
 
   skip_before_action :project_membership_required
 
-  cache_sweeper :institutions_sweeper, only: [:update, :create, :destroy]
-  include Seek::BreadCrumbs
+  cache_sweeper :institutions_sweeper, only: [:update, :create, :destroy]  
 
   api_actions :index, :show, :create, :update, :destroy
 
@@ -108,7 +107,7 @@ class InstitutionsController < ApplicationController
     end
 
     if params[:include_new]
-      items.unshift({id:-1, name:params[:query],web_page:'',country:'', country_name:'',city:'',hint:"new item", new:true})
+      items.unshift({id:-1, name:params[:query], web_page: '', country: '', country_name: '', city: '', hint:"new item", new: true })
     end
 
     respond_to do |format|
@@ -116,10 +115,33 @@ class InstitutionsController < ApplicationController
     end
   end
 
+  # returns a list of all institutions in JSON format
+  def request_all
+    # listing all institutions is public data, but still
+    # we require login to protect from unwanted requests
+    institution_list = Institution.get_all_institutions_listing
+    respond_to do |format|
+       format.json do
+         render json: institution_list
+       end
+    end
+  end
+
+  # request all institutions, but specific to the sharing form which expects an array
+  def request_all_sharing_form
+    institution_list = Institution.order(:id).collect{ |institution| [institution.title, institution.id] }
+    respond_to do |format|
+      format.json do       
+        render json: { status: 200, institution_list: institution_list }       
+      end
+    end
+  end
+
   private
 
   def institution_params
-    params.require(:institution).permit(:title, :web_page, :address, :city, :country)
+    params.require(:institution).permit(:title, :web_page, :address, :city, :country,
+                                        discussion_links_attributes:[:id, :url, :label, :_destroy])
   end
 
   def editable_by_user

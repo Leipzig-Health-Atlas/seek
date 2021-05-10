@@ -288,6 +288,8 @@ class OmniauthTest < ActionDispatch::IntegrationTest
       end
     end
 
+    refute assigns(:existing_email)
+    assert_select 'div.alert.alert-warning', text: /If you wanted to link this identity to your existing/, count: 0
     assert_equal 'Githubuser', assigns(:person).last_name
     assert_equal 'New', assigns(:person).first_name
     assert_equal 'new_github_user@example.com', assigns(:person).email
@@ -300,5 +302,59 @@ class OmniauthTest < ActionDispatch::IntegrationTest
     assert_equal 'github', identity.provider
     assert_equal 'new_github_user', identity.uid
     assert_match(/You have successfully registered your account, but you need to create a profile/, flash[:notice])
+  end
+
+  test 'should warn new omniauth user about existing account' do
+    Factory(:person, email: 'new_github_user@example.com')
+
+    OmniAuth.config.mock_auth[:github] = @github_mock_auth
+
+    assert_difference('User.count', 1) do
+      assert_difference('Identity.count', 1) do
+        post omniauth_authorize_path(:github)
+        follow_redirect! # OmniAuth callback
+        assert_redirected_to(/#{register_people_path}/)
+        follow_redirect! # New profile
+      end
+    end
+
+    assert assigns(:existing_email)
+    assert_select 'div.alert.alert-warning', text: /If you wanted to link this identity to your existing/
+  end
+
+  test 'LDAP auth failure should redirect to login page and show error' do
+    OmniAuth.config.mock_auth[:ldap] = :invalid_credentials
+    OmniAuth.config.on_failure = Proc.new { |env| OmniAuth::FailureEndpoint.new(env).redirect_to_failure }
+
+    assert_no_difference('User.count') do
+      assert_no_difference('Identity.count') do
+        post omniauth_callback_path(:ldap)
+        assert_redirected_to(omniauth_failure_path(strategy: 'ldap', message: 'invalid_credentials'))
+        follow_redirect!
+
+        assert_equal "LDAP authentication failure (Invalid username/password?)", flash[:error]
+        assert_select '#ldap_login.active'
+        assert_select '#password_login.active', count: 0
+      end
+    end
+  end
+
+  test 'ELIXIR AAI auth failure should redirect to login page and show error' do
+    OmniAuth.config.mock_auth[:elixir_aai] = :invalid_credentials
+    OmniAuth.config.on_failure = Proc.new { |env| OmniAuth::FailureEndpoint.new(env).redirect_to_failure }
+
+    assert_no_difference('User.count') do
+      assert_no_difference('Identity.count') do
+        post omniauth_authorize_path(:elixir_aai)
+        follow_redirect!
+        assert_redirected_to(omniauth_failure_path(strategy: 'elixir_aai', message: 'invalid_credentials'))
+        follow_redirect!
+
+        assert_equal "ELIXIR AAI authentication failure (Invalid username/password?)", flash[:error]
+        assert_select '#elixir_aai_login.active'
+        assert_select '#ldap_login.active', count: 0
+        assert_select '#password_login.active', count: 0
+      end
+    end
   end
 end

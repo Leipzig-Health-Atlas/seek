@@ -473,13 +473,32 @@ class ProgrammeTest < ActiveSupport::TestCase
     prog1 = Factory(:programme)
     prog2 = Factory(:programme)
     with_config_value(:managed_programme_id,prog1.id) do
-      assert_equal prog1,Programme.managed_programme
+      assert_equal prog1,Programme.site_managed_programme
+      assert prog1.site_managed?
+      refute prog2.site_managed?
     end
     with_config_value(:managed_programme_id,prog2.id) do
-      assert_equal prog2,Programme.managed_programme
+      assert_equal prog2,Programme.site_managed_programme
+      refute prog1.site_managed?
+      assert prog2.site_managed?
     end
     with_config_value(:managed_programme_id,nil) do
-      assert_nil Programme.managed_programme
+      assert_nil Programme.site_managed_programme
+      refute prog1.site_managed?
+      refute prog2.site_managed?
+    end
+  end
+
+  test 'allows_user_projects?' do
+    prog = Factory(:programme, open_for_projects:true)
+    prog2 = Factory(:programme, open_for_projects:false)
+    with_config_value(:programmes_open_for_projects_enabled, true) do
+      assert prog.allows_user_projects?
+      refute prog2.allows_user_projects?
+    end
+    with_config_value(:programmes_open_for_projects_enabled, false) do
+      refute prog.allows_user_projects?
+      refute prog2.allows_user_projects?
     end
   end
 end

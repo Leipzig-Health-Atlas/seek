@@ -80,6 +80,14 @@ class DataFile < ApplicationRecord
     def event_ids=(_events_ids); end
   end
 
+  # Returns the columns to be shown on the table view for the resource
+  def columns_default
+    super + ['creators','projects','version']
+  end
+  def columns_allowed
+    columns_default + ['last_used_at','other_creators','doi','license','simulation_data','deleted_contributor']
+  end
+
   def included_to_be_copied?(symbol)
     case symbol.to_s
     when 'activity_logs', 'versions', 'attributions', 'relationships', 'inverse_relationships', 'annotations'
@@ -217,7 +225,7 @@ class DataFile < ApplicationRecord
   end
 
   def populate_metadata_from_template
-    if contains_extractable_spreadsheet?
+    if contains_extractable_excel?
       Seek::Templates::Extract::DataFileRightFieldExtractor.new(self).populate(self)
     else
       Set.new
@@ -226,7 +234,7 @@ class DataFile < ApplicationRecord
 
   def initialise_assay_from_template
     assay = Assay.new
-    if contains_extractable_spreadsheet?
+    if contains_extractable_excel?
       warnings = Seek::Templates::Extract::AssayRightfieldExtractor.new(self).populate(assay)
       return assay, warnings
     else
@@ -237,4 +245,6 @@ class DataFile < ApplicationRecord
   def human_disease_terms
     human_diseases.collect(&:searchable_terms).flatten
   end
+
+  has_task :sample_extraction
 end
