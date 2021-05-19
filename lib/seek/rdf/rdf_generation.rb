@@ -96,7 +96,7 @@ module Seek
       def ns_prefixes
         {
           'jerm' => JERMVocab.to_uri.to_s,
-          'dc'   => RDF::Vocab::DC.to_uri.to_s,
+          'dct'   => RDF::Vocab::DC.to_uri.to_s,
           'owl'  => RDF::Vocab::OWL.to_uri.to_s,
           'foaf' => RDF::Vocab::FOAF.to_uri.to_s,
           'sioc' => RDF::Vocab::SIOC.to_uri.to_s,
