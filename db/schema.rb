@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_03_18_115608) do
+ActiveRecord::Schema.define(version: 2021_05_28_162620) do
 
   create_table "activity_logs", id: :integer,  force: :cascade do |t|
     t.string "action"
@@ -823,25 +823,24 @@ ActiveRecord::Schema.define(version: 2021_03_18_115608) do
     t.index ["project_id"], name: "index_investigations_projects_on_project_id"
   end
 
-  create_table "lha_phenotypes", id: :string, force: :cascade do |t|
-    t.text     "title",                                                          null: false
-    t.text     "description"
-    t.string   "datatype",           limit: 50
-    t.string   "formula",            limit: 300
-    t.string   "variables",          limit: 300,                                              array: true
-    t.string   "range",              limit: 100
-    t.decimal  "score"
-    t.text     "query"
-    t.integer  "index"
-    t.string   "unit"
-    t.string   "lha_phenotype_id"
-    t.string   "phenotype_group_id",                                             null: false
-    t.datetime "created_at",                     default: '2019-06-17 09:33:24', null: false
-    t.datetime "updated_at",                     default: '2019-06-17 09:33:24', null: false
+  create_table "lha_phenotypes", id: :string,  force: :cascade do |t|
+    t.text "title", null: false
+    t.text "description"
+    t.string "datatype", limit: 50
+    t.string "formula", limit: 300
+    t.string "variables", limit: 300
+    t.string "range", limit: 100
+    t.decimal "score", precision: 10
+    t.text "query"
+    t.integer "index"
+    t.string "unit"
+    t.string "lha_phenotype_id"
+    t.string "phenotype_group_id", null: false
+    t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
+    t.datetime "updated_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
+    t.index ["lha_phenotype_id"], name: "index_lha_phenotypes_on_lha_phenotype_id"
+    t.index ["phenotype_group_id"], name: "index_lha_phenotypes_on_phenotype_group_id"
   end
-
-  add_index "lha_phenotypes", ["lha_phenotype_id"], name: "index_lha_phenotypes_on_lha_phenotype_id", using: :btree
-  add_index "lha_phenotypes", ["phenotype_group_id"], name: "index_lha_phenotypes_on_phenotype_group_id", using: :btree
 
   create_table "mapping_links", id: :integer,  force: :cascade do |t|
     t.string "substance_type"
@@ -1204,23 +1203,22 @@ ActiveRecord::Schema.define(version: 2021_03_18_115608) do
     t.index ["policy_id"], name: "index_permissions_on_policy_id"
   end
 
-  create_table "phenotype_algorithms", id: :string, force: :cascade do |t|
-    t.text     "title",                                       null: false
-    t.text     "description"
-    t.datetime "created_at",  default: '2019-06-17 09:33:24', null: false
-    t.datetime "updated_at",  default: '2019-06-17 09:33:24', null: false
+  create_table "phenotype_algorithms", id: :string,  force: :cascade do |t|
+    t.text "title", null: false
+    t.text "description"
+    t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
+    t.datetime "updated_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
   end
 
-  create_table "phenotype_groups", id: :string, force: :cascade do |t|
-    t.text     "title",                                                  null: false
-    t.text     "description"
-    t.integer  "index"
-    t.string   "phenotype_algorithm_id",                                 null: false
-    t.datetime "created_at",             default: '2019-06-17 09:33:24', null: false
-    t.datetime "updated_at",             default: '2019-06-17 09:33:24', null: false
+  create_table "phenotype_groups", id: :string,  force: :cascade do |t|
+    t.text "title", null: false
+    t.text "description"
+    t.integer "index"
+    t.string "phenotype_algorithm_id", null: false
+    t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
+    t.datetime "updated_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
+    t.index ["phenotype_algorithm_id"], name: "index_phenotype_groups_on_phenotype_algorithm_id"
   end
-
-  add_index "phenotype_groups", ["phenotype_algorithm_id"], name: "index_phenotype_groups_on_phenotype_algorithm_id", using: :btree
 
   create_table "phenotypes", id: :integer,  force: :cascade do |t|
     t.text "description"
