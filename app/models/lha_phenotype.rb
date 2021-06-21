@@ -1,7 +1,4 @@
 class LhaPhenotype < ApplicationRecord
-
-  scope :default_order, -> { order('index') }
-
   validates :id, presence: true, uniqueness: true
   validates :title, presence: true
   validates :phenotype_group_id, presence: true
@@ -11,10 +8,6 @@ class LhaPhenotype < ApplicationRecord
   belongs_to :lha_phenotype
 
   has_many :lha_phenotypes, foreign_key:'lha_phenotype_id', dependent: :destroy
-
-  searchable(auto_index: false) do
-    text :id, :title, :description, :datatype
-  end if Seek::Config.solr_enabled
 
   def can_edit?(user = User.current_user)
     !user.nil? and user.is_admin?

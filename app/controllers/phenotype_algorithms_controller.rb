@@ -1,12 +1,8 @@
 class PhenotypeAlgorithmsController < ApplicationController
-	include CommonSweepers
-
 	before_action :find_requested_item, only: [ :show, :update, :destroy ]
 	before_action :is_user_admin_auth, only: [ :destroy ]
 	before_action :is_user_admin_auth, only: [ :update ]
 	before_action :is_user_admin_auth, only: [ :create ]
-
-	cache_sweeper :human_diseases_sweeper, only: [ :update, :create, :destroy ]
 
 	# GET /phenotype_algorithms
 	# GET /phenotype_algorithms.json
