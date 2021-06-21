@@ -1,4 +1,4 @@
-class PhenotypeGroup < ActiveRecord::Base
+class PhenotypeGroup < ApplicationRecord
 
   scope :default_order, -> { order('index') }
 

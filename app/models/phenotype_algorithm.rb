@@ -1,4 +1,4 @@
-class PhenotypeAlgorithm < ActiveRecord::Base
+class PhenotypeAlgorithm < ApplicationRecord
   include Seek::Search::BackgroundReindexing
   include Seek::Favouritable
 

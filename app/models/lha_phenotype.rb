@@ -1,4 +1,4 @@
-class LhaPhenotype < ActiveRecord::Base
+class LhaPhenotype < ApplicationRecord
 
   scope :default_order, -> { order('index') }
 
