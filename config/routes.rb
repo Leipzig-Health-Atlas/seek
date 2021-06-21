@@ -746,9 +746,7 @@ SEEK::Application.routes.draw do
   get '/home/isa_colours' => 'homes#isa_colours'
 
   ### Phenotype Algorithms
-  if Seek::Config.phenotype_algorithms_enabled
-    resources :phenotype_algorithms, only: [ :index, :create, :show, :update, :destroy ]
-    resources :phenotype_groups, only: [ :index, :create, :show, :update, :destroy ]
-    resources :lha_phenotypes, only: [ :index, :create, :show, :update, :destroy ]
-  end
+  resources :phenotype_algorithms, only: [ :index, :create, :show, :update, :destroy ]
+  resources :phenotype_groups, only: [ :index, :create, :show, :update, :destroy ]
+  resources :lha_phenotypes, only: [ :index, :create, :show, :update, :destroy ]
 end
