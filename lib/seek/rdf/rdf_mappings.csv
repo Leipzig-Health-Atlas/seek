@@ -111,7 +111,7 @@ Project,web_page,JERMVocab.webLink,l,URI.parse(item),compact
 Project,web_page,RDF::Vocab::DCAT.landingPage,l,URI.parse(item),compact
 Project,rdf_seek_id,JERMVocab.seekID,l,URI.parse(item),
 Project,rdf_seek_id,RDF::Vocab::DC.identifier,l,URI.parse(item),
-Project,rdf_seek_id,RDF::Vocab::DC.type,u,RDF::Vocab::PROV::Activity,
+Project,rdf_seek_id,RDF::Vocab::DC.type,u,RDF::Vocab::PROV.Activity,
 Publication,projects,JERMVocab.itemProducedBy,u,,
 Publication,projects,RDF::Vocab::PROV.wasGeneratedBy,u,,
 Publication,assays,JERMVocab.isPartOf,u,,
